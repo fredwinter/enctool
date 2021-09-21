@@ -15,6 +15,9 @@ int main(int argc, char **argv)
 	unsigned int hex_flag = 0;
 	char *message = NULL;
 	int c;
+
+	// set the argparser not to print any errors.
+	opterr = 0;
 		
 	// check if the number of arguments is zero and
 	// print out the help.
@@ -31,9 +34,21 @@ int main(int argc, char **argv)
 		{
 			case 'e':
 				encode_flag = 1;
+				if (decode_flag == 1)
+				{
+					fprintf(stderr, "%s: cannot use option -e with option -d.\n", pname);
+					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
+					return EXIT_FAILURE;
+				}
 				break;
 			case 'd':
 				decode_flag = 1;
+				if (encode_flag == 1)
+				{
+					fprintf(stderr, "%s: cannot use option -e with option -d.\n", pname);
+					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
+					return EXIT_FAILURE;
+				}
 				break;
 			case 'c':
 				cipher = optarg;
@@ -47,17 +62,35 @@ int main(int argc, char **argv)
 			case '?':
 				if (optopt == 'c')
 				{
-					fprintf(stderr, "Option '-%c' requires a cipher as an argument.\n", optopt);
+					fprintf(stderr, "%s: option '-%c' requires a cipher number as an argument.\n", pname, optopt);
+					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
 				}
 				else if (isprint(optopt))
 				{
-					fprintf(stderr, "Unknown option '-%c'.\n", optopt);
+					fprintf(stderr, "%s: invalid option '-%c'.\n", pname, optopt);
+					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
 				}
-				print_help(pname);
 				return EXIT_FAILURE;
 			default:
 				print_help(pname);
 				return EXIT_FAILURE;
 		}
 	}
+
+	if (encode_flag == 0 && decode_flag == 0)
+	{
+		fprintf(stderr, "%s: one of -e of -d is required.\n", pname);
+		fprintf(stderr, "Try '%s -h' for more information.\n", pname);
+		return EXIT_FAILURE;
+	}
+
+	// set the message variable to the non-option argument.
+	message = argv[optind];
+	if (message == NULL)
+	{
+		fprintf(stderr, "%s: a message is required.\n", pname);
+		fprintf(stderr, "Try '%s -h' for more information.\n", pname);
+		return EXIT_FAILURE;
+	}
+	printf("Message: %s\n", message);
 }

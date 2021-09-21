@@ -9,9 +9,9 @@ void print_help(char *pname)
 
 	printf("Options:\n");
 	printf("\t-h\t\t\tPrint this help message.\n");
-	printf("\t-e\t\t\tEncrypt the message. One of -e or -d is required.\n");
-	printf("\t-d\t\t\tDecrypt the message. One of -e or -d is required.\n");
-	printf("\t-c <number>\t\tSelect the cipher's number.\n");
+	printf("\t-e\t\t\tEncrypt the message. One of -e or -d required.\n");
+	printf("\t-d\t\t\tDecrypt the message. One of -e or -d required.\n");
+	printf("\t-c <number>\t\tSelect the cipher's number. Required.\n");
 	printf("\t-x\t\t\tPrint the encrypted message as hexadecimal.\n");
 
 	printf("\n");
