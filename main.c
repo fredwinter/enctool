@@ -160,6 +160,7 @@ int main(int argc, char **argv)
 		{
 			printf("Result in hexadecimal: 0x%x\n", res);
 		}
+		free(res);
 	}
 	else
 	{
