@@ -7,6 +7,8 @@ Encryptool
 * ROT13
 * Caesar
 * Shift
+* XOR (TODO)
+* Vigenère (TODO)
 
 ## License
 Apache 2

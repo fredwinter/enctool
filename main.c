@@ -2,19 +2,17 @@
 #include "shift.h"
 #include "help.h"
 
-// TODO:
-// tentar um autocomplete.
+//considerar transformar os erros em função.
 
 int main(int argc, char **argv)
 {
 	char *pname = argv[0];
-	uint8_t encode_flag = 0;
-	uint8_t decode_flag = 0;
-	uint8_t cipher;
-	uint8_t key = 0;
-	uint8_t hex_flag = 0;
+	unsigned int encode_flag = 0;
+	unsigned int decode_flag = 0;
+	unsigned int hex_flag = 0;
+	unsigned int cipher = 0;
 	char *message = NULL;
-	int c;
+	key k;
 
 	// set the argparser not to print any errors.
 	opterr = 0;
@@ -27,6 +25,7 @@ int main(int argc, char **argv)
 	}
 
 	// parse the CLI arguments.
+	int c;
 	while ((c = getopt(argc, argv, ":hedxc:k:")) != -1)
 	{
 		switch(c)
@@ -50,22 +49,24 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'c':
-				if (!atoi(optarg))
+				if (!input_is_digit(optarg))
 				{
-					fprintf(stderr, "%s: cipher number not valid.\n", pname);
+					fprintf(stderr, "%s: the cipher's code is not valid.\n", pname);
 					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
 					return EXIT_FAILURE;
 				}
 				cipher = atoi(optarg);
 				break;
 			case 'k':
-				if (atoi(optarg) <= 0)
+				k.is_digit = input_is_digit(optarg);
+				if (k.is_digit)
 				{
-					fprintf(stderr, "%s: key value must be a potivive int.\n", pname);
-					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-					return EXIT_FAILURE;
+					k.num = atoi(optarg);
 				}
-				key = atoi(optarg);
+				else
+				{
+					k.str = optarg;
+				}
 				break;
 			case 'x':
 				hex_flag = 1;
@@ -87,7 +88,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	// check if both -e and -d are set.
+	// check if either -e or -d are set.
 	if (encode_flag == 0 && decode_flag == 0)
 	{
 		fprintf(stderr, "%s: one of -e of -d is required.\n", pname);
@@ -106,45 +107,36 @@ int main(int argc, char **argv)
 
 	char *res = NULL;
 
-	// call the cipher function.
+	// call the encrypt/decrypt function for the chosen cipher.
 	switch (cipher)
 	{
-		case 1: // Shift.
-			if (key == 0)
+		// 1. Shift.
+		case 1:
+			// check if the key is a digit.
+			if (!k.is_digit || k.is_digit && k.num == 0)
 			{
-				fprintf(stderr, "%s: shift cipher requires a key.\n", pname);
+				fprintf(stderr, "%s: shift cipher requires a positive integer as key.\n", pname);
 				fprintf(stderr, "Try '%s -h' for more information.\n", pname);
 				return EXIT_FAILURE;
+				
 			}
-			if (encode_flag == 1)
+			else
 			{
-				res = enc_shift(message, key % 26); // cap the key value limit to 26 (alphabet letters)
-			}
-			else if (decode_flag == 1)
-			{
-				res = dec_shift(message, key % 26); // cap the key value limit to 26 (alphabet letters)
+				// cap the key value limit to 26 (alphabet letters)
+				res = encode_flag == 1 ? enc_shift(message, k.num % 26) : dec_shift(message, k.num % 26);
 			}
 			break;
-		case 2: // Caesar.
-			if (encode_flag == 1)
-			{
-				res = enc_shift(message, 3);
-			}
-			else if (decode_flag == 1)
-			{
-				res = dec_shift(message, 3);
-			}
+		// 2. Caesar.
+		case 2:
+			res = encode_flag == 1 ? enc_shift(message, 3) : dec_shift(message, 3);
 			break;
-		case 3: // ROT-13.
-			if (encode_flag == 1)
-			{
-				res = enc_shift(message, 13);
-			}
-			else if (decode_flag == 1)
-			{
-				res = dec_shift(message, 13);
-			}
+		// 3. ROT-13.
+		case 3:
+			res = encode_flag == 1 ? enc_shift(message, 13) : dec_shift(message, 13);
 			break;
+		// XOR.
+		// case 4:
+		// 	res = encode_flag == 1 ? enc_shift(message, k.str) : dec_shift(message, k.str);
 		default:
 			fprintf(stderr, "%s: cipher number not valid.\n", pname);
 			fprintf(stderr, "Try '%s -h' for more information.\n", pname);
@@ -168,4 +160,18 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Try '%s -h' for more information.\n", pname);
 		return EXIT_FAILURE;
 	}
+}
+
+bool input_is_digit(char *arg)
+{
+	bool is_digit = true;
+	int len = strlen(arg);
+	for (int i = 0; i < len; i++)
+	{
+		if (!isdigit(arg[i]))
+		{
+			is_digit = false;
+		}
+	}
+	return is_digit;
 }
