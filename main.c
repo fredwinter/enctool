@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 		//shift
 		case 1:
 			//check if the key is a digit
-			if (!k.is_digit || k.is_digit && k.num == 0)
+			if ((!k.is_digit || k.is_digit) && k.num == 0)
 			{
 				err_n_exit("shift cipher requires a positive integer as key", pname);
 			}
