@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
+#include <ctype.h>
 
 bool input_is_digit(char *arg);
 
