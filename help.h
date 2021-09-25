@@ -4,6 +4,6 @@
 #include <stdlib.h>
 #include "main.h"
 
-void print_help(char *pname);
+void print_help(const char *pname);
 
 #endif

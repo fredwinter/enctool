@@ -1,62 +1,72 @@
 #include "main.h"
 #include "shift.h"
 #include "help.h"
+#include "err_n_exit.h"
+#include "check_digit.h"
 
-//considerar transformar os erros em função.
+//considerar transformar os erros em função, em arquivo separado.
+// melhorar o argparser
+//colocar a escolha da função em arquivo separado
 
 int main(int argc, char **argv)
 {
-	char *pname = argv[0];
-	unsigned int encode_flag = 0;
-	unsigned int decode_flag = 0;
-	unsigned int hex_flag = 0;
-	unsigned int cipher = 0;
-	char *message = NULL;
+
+	const char *pname = argv[0];
+	uint8_t encode_flag = 0;
+	uint8_t decode_flag = 0;
+	uint8_t cipher = 0;
+	const char *message = NULL;
 	key k;
 
-	// set the argparser not to print any errors.
+	//set the argparser not to print any errors.
 	opterr = 0;
 		
-	//check if the number of arguments is zero and print out the help.
+	//check if the number of arguments is zero and print out the help
 	if (argc == 1)
 	{
 		print_help(pname);
 		return EXIT_FAILURE;
 	}
 
-	// parse the CLI arguments.
+	//parse the CLI arguments
 	int c;
-	while ((c = getopt(argc, argv, ":hedxc:k:")) != -1)
+	while ((c = getopt(argc, argv, ":he:d:k:")) != -1)
 	{
 		switch(c)
 		{
+			//encode flag
 			case 'e':
 				encode_flag = 1;
+
+				//if the encode flag is used with the decode flag, throw an error
 				if (decode_flag == 1)
-				{
-					fprintf(stderr, "%s: cannot use option -e with option -d.\n", pname);
-					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-					return EXIT_FAILURE;
-				}
-				break;
-			case 'd':
-				decode_flag = 1;
-				if (encode_flag == 1)
-				{
-					fprintf(stderr, "%s: cannot use option -e with option -d.\n", pname);
-					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-					return EXIT_FAILURE;
-				}
-				break;
-			case 'c':
+					err_n_exit("cannot use option -e with option -d", pname);
+
+				//if the cipher's code is not a digit, throw an error
 				if (!input_is_digit(optarg))
-				{
-					fprintf(stderr, "%s: the cipher's code is not valid.\n", pname);
-					fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-					return EXIT_FAILURE;
-				}
+					err_n_exit("the cipher's code is not valid", pname);
+
+				//set the cipher variable to the given code
 				cipher = atoi(optarg);
 				break;
+
+			//decode flag
+			case 'd':
+				decode_flag = 1;
+
+				//if the decode flag is used with the encode flag, throw an error
+				if (encode_flag == 1)
+					err_n_exit("cannot use option -e with option -d", pname);
+
+				//if the cipher's code is not a digit, throw an error
+				if (!input_is_digit(optarg))
+					err_n_exit("the cipher's code is not valid", pname);
+
+				//set the cipher variable to the given code
+				cipher = atoi(optarg);
+				break;
+
+			//key
 			case 'k':
 				k.is_digit = input_is_digit(optarg);
 				if (k.is_digit)
@@ -68,12 +78,13 @@ int main(int argc, char **argv)
 					k.str = optarg;
 				}
 				break;
-			case 'x':
-				hex_flag = 1;
-				break;
+			
+			//help
 			case 'h':
 				print_help(pname);
 				return EXIT_SUCCESS;
+			
+			//errors
 			case ':':
 				fprintf(stderr, "%s: option '-%c' requires an argument.\n", pname, optopt);
 				fprintf(stderr, "Try '%s -h' for more information.\n", pname);
@@ -88,90 +99,59 @@ int main(int argc, char **argv)
 		}
 	}
 
-	// check if either -e or -d are set.
+	//check if at least one of -e or -d are set
 	if (encode_flag == 0 && decode_flag == 0)
-	{
-		fprintf(stderr, "%s: one of -e of -d is required.\n", pname);
-		fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-		return EXIT_FAILURE;
-	}
+		err_n_exit("one of -e of -d is required", pname);
 
-	// set the message variable to the non-option argument.
+	//set the message variable to the non-option argument passed by the user
 	message = argv[optind];
 	if (message == NULL)
-	{
-		fprintf(stderr, "%s: a message is required.\n", pname);
-		fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-		return EXIT_FAILURE;
-	}
+		err_n_exit("a message is required", pname);
 
 	char *res = NULL;
 
-	// call the encrypt/decrypt function for the chosen cipher.
-	switch (cipher)
-	{
-		// 1. Shift.
+	//call the encrypt/decrypt function for the chosen cipher
+	switch (cipher) {
+
+		//shift
 		case 1:
-			// check if the key is a digit.
+			//check if the key is a digit
 			if (!k.is_digit || k.is_digit && k.num == 0)
 			{
-				fprintf(stderr, "%s: shift cipher requires a positive integer as key.\n", pname);
-				fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-				return EXIT_FAILURE;
-				
+				err_n_exit("shift cipher requires a positive integer as key", pname);
 			}
 			else
 			{
-				// cap the key value limit to 26 (alphabet letters)
+				//cap the key value limit to 26 (alphabet letters)
 				res = encode_flag == 1 ? enc_shift(message, k.num % 26) : dec_shift(message, k.num % 26);
 			}
 			break;
-		// 2. Caesar.
+
+		//caesar
 		case 2:
 			res = encode_flag == 1 ? enc_shift(message, 3) : dec_shift(message, 3);
 			break;
-		// 3. ROT-13.
+
+		//rot-13
 		case 3:
 			res = encode_flag == 1 ? enc_shift(message, 13) : dec_shift(message, 13);
 			break;
-		// XOR.
+
+		//xor
 		// case 4:
 		// 	res = encode_flag == 1 ? enc_shift(message, k.str) : dec_shift(message, k.str);
 		default:
-			fprintf(stderr, "%s: cipher number not valid.\n", pname);
-			fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-			return EXIT_FAILURE;
+			err_n_exit("cipher number not valid", pname);
 	}
 
-	// print out the result.
+	//print out the result
 	if (res != NULL)
 	{
-		printf("Message: %s\n", message);
-		printf("Result: %s\n", res);
-		if (hex_flag == 1)
-		{
-			printf("Result in hexadecimal: 0x%x\n", res);
-		}
+		printf("%s\n", res);
 		free(res);
 	}
 	else
 	{
-		fprintf(stderr, "%s: could not encrypt or decrypt the message.\n", pname);
-		fprintf(stderr, "Try '%s -h' for more information.\n", pname);
-		return EXIT_FAILURE;
+		err_n_exit("could not encrypt or decrypt the message", pname);
 	}
-}
-
-bool input_is_digit(char *arg)
-{
-	bool is_digit = true;
-	int len = strlen(arg);
-	for (int i = 0; i < len; i++)
-	{
-		if (!isdigit(arg[i]))
-		{
-			is_digit = false;
-		}
-	}
-	return is_digit;
 }
