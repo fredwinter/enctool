@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-char *enc_shift(char *text, uint8_t distance);
-char *dec_shift(char *text, uint8_t distance);
+char *enc_shift(const char *text, uint8_t distance);
+char *dec_shift(const char *text, uint8_t distance);
 
 #endif
