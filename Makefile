@@ -1,16 +1,10 @@
-CC=gcc
-CFLAGS="-g --Wall"
+CC=clang
+CFLAGS=-g -Wall
 
-all: build install
+all: enctool
 
-build: main.c shift.c help.c
-	$(CC) $(CFLAGS) -o encryptool main.c shift.c help.c
-
-debug:
-	$(CC) $(CFLAGS) main.c shift.c help.c
-
-install:
-	mv ./encryptool /usr/bin/encryptool
+enctool: main.c shift.c help.c err_n_exit.c check_digit.c
+	$(CC) $(CFLAGS) -o enctool main.c shift.c help.c err_n_exit.c check_digit.c
 
 clean:
-	rm encryptool a.out
+	rm -rf enctool a.out
