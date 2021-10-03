@@ -1,9 +1,4 @@
 #include "main.h"
-#include "shift.h"
-#include "help.h"
-#include "err_n_exit.h"
-#include "check_digit.h"
-#include "xor.h"
 
 // melhorar o argparser
 //colocar a escolha da função em arquivo separado

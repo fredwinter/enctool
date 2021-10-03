@@ -1,4 +1,4 @@
-#include "check_digit.h"
+#include "key.h"
 
 bool input_is_digit(char *arg)
 {

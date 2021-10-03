@@ -1,5 +1,5 @@
-#ifndef CHECK_DIGIT_H
-#define CHECK_DIGIT_H
+#ifndef KEY_H
+#define KEY_H
 
 #include <stdbool.h>
 #include <stddef.h>

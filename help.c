@@ -20,6 +20,6 @@ void print_help(const char *pname)
 	printf("\t1\t\t\tShift. Requires a key (positive integer).\n");
 	printf("\t2\t\t\tCaesar.\n");
 	printf("\t3\t\t\tROT-13.\n");
-	printf("\t4\t\t\tXOR. Requires a key (<= 100 chars).\n");
-	printf("\t5\t\t\tVigenère. Requires a key (<= 100 chars).\n");
+	printf("\t4\t\t\tXOR. Requires a key (integer or string).\n");
+	printf("\t5\t\t\tVigenère. Requires a key (string).\n");
 }
