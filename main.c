@@ -3,10 +3,11 @@
 #include "help.h"
 #include "err_n_exit.h"
 #include "check_digit.h"
+#include "xor.h"
 
-//considerar transformar os erros em função, em arquivo separado.
 // melhorar o argparser
 //colocar a escolha da função em arquivo separado
+//colocar o parser em arquivo separado... passar o ponteiro das variáveis
 
 int main(int argc, char **argv)
 {
@@ -111,20 +112,18 @@ int main(int argc, char **argv)
 	char *res = NULL;
 
 	//call the encrypt/decrypt function for the chosen cipher
-	switch (cipher) {
+	switch (cipher)
+	{
 
 		//shift
 		case 1:
 			//check if the key is a digit
-			if ((!k.is_digit || k.is_digit) && k.num == 0)
+			if (!k.is_digit || (k.is_digit && k.num == 0))
 			{
 				err_n_exit("shift cipher requires a positive integer as key", pname);
 			}
-			else
-			{
-				//cap the key value limit to 26 (alphabet letters)
-				res = encode_flag == 1 ? enc_shift(message, k.num % 26) : dec_shift(message, k.num % 26);
-			}
+			//cap the key value limit to 26 (alphabet letters)
+			res = encode_flag == 1 ? enc_shift(message, k.num % 26) : dec_shift(message, k.num % 26);
 			break;
 
 		//caesar
@@ -138,8 +137,15 @@ int main(int argc, char **argv)
 			break;
 
 		//xor
-		// case 4:
-		// 	res = encode_flag == 1 ? enc_shift(message, k.str) : dec_shift(message, k.str);
+		case 4:
+			res = encode_flag == 1 ? enc_xor(message, k) : dec_xor(message, k);
+			break;
+
+		//vigerère
+		case 5:
+			break;
+
+		//error
 		default:
 			err_n_exit("cipher number not valid", pname);
 	}
