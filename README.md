@@ -7,7 +7,7 @@ Encryptool
 * ROT13
 * Caesar
 * Shift
-* XOR (TODO)
+* XOR
 * Vigenère (TODO)
 
 ## License
