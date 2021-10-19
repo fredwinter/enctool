@@ -1,6 +1,7 @@
 #include "shift.h"
 
-/* This function encrypts a text using a shift cipher
+/*
+ * This function encrypts a text using a shift cipher
  * with a given distance (int).
  * enc_shift("text", 3) will encrypt the text using the
  * caesar cipher and enc_shift("text", 13) will encrypt
@@ -14,7 +15,7 @@ char *enc_shift(const char *message, uint8_t distance)
         return NULL;
 
     size_t len = strlen(message);
-    char *enc = malloc(sizeof(char) * len);
+    char *enc = malloc(sizeof(char) * len + 1);
 
     //check if malloc failed
     if (enc == NULL)
@@ -22,6 +23,7 @@ char *enc_shift(const char *message, uint8_t distance)
         printf("Error allocating memory.");
         exit(EXIT_FAILURE);
     }
+    memset(enc, '\0', len + 1);
 
     for (size_t i = 0; i < len; i++)
     {
@@ -46,7 +48,8 @@ char *enc_shift(const char *message, uint8_t distance)
     return enc;
 }
 
-/* This function decrypts a text using the shift cipher
+/*
+ * This function decrypts a text using the shift cipher
  * with a given distance (int).
  * dec_shift("text", 3) will decrypt the text using the
  * caesar cipher and enc_shift("text", 13) will encrypt
@@ -60,7 +63,7 @@ char *dec_shift(const char *message, uint8_t distance)
         return NULL;
 
     size_t len = strlen(message);
-    char *dec = malloc(sizeof(char) * len);
+    char *dec = malloc(sizeof(char) * len + 1);
 
     //check if malloc failed
     if (dec == NULL)
@@ -68,6 +71,7 @@ char *dec_shift(const char *message, uint8_t distance)
         printf("Error allocating memory.");
         exit(EXIT_FAILURE);
     }
+    memset(dec, '\0', len + 1);
 
     for (size_t i = 0; i < len; i++)
     {
