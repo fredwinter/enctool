@@ -1,5 +1,15 @@
 #include "xor.h"
 
+/*
+ * This function encrypts a text using the xor
+ * cipher. It works applying the exclusive
+ * disjunction binary operation.
+ * 
+ * Example:
+ * Message: label = 0110110001100001011000100110010101101100
+ * Key    : 13    = 0000110100001101000011010000110100001101
+ * enc_xor: aloha = 0110000101101100011011110110100001100001
+ */
 char *enc_xor(const char *message, key k)
 {
     size_t k_len = 0;
@@ -33,6 +43,16 @@ char *enc_xor(const char *message, key k)
     return enc;
 }
 
+/*
+ * This function decrypts a text using the xor
+ * cipher. It works applying the exclusive
+ * disjunction binary operation.
+ * 
+ * Since the operation is the same we do when
+ * encrypting the text, this function just calls
+ * the enc_xor().
+ * 
+ */
 char *dec_xor(const char *message, key k)
 {
     return enc_xor(message, k);
