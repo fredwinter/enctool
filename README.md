@@ -8,7 +8,7 @@ Encryptool
 * Caesar
 * Shift
 * XOR
-* Vigenère (TODO)
+* Vigenère
 
 ## License
 Apache 2

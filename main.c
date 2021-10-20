@@ -1,8 +1,6 @@
 #include "main.h"
 
-// melhorar o argparser
 //colocar a escolha da função em arquivo separado
-//colocar o parser em arquivo separado... passar o ponteiro das variáveis
 
 int main(int argc, char **argv)
 {
@@ -138,6 +136,11 @@ int main(int argc, char **argv)
 
 		//vigerère
 		case 5:
+			if (k.is_digit)
+			{
+				err_n_exit("vigenere cipher requires a string as key", pname);
+			}
+			res = encode_flag == 1 ? enc_vigenere(message, k) : dec_vigenere(message, k);
 			break;
 
 		//error

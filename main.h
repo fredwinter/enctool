@@ -7,5 +7,6 @@
 #include "err_n_exit.h"
 #include "key.h"
 #include "xor.h"
+#include "vigenere.h"
 
 #endif
